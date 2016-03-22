@@ -5,75 +5,50 @@
         .factory('login', function($http) {
             var loginInfo = {};
             var changes = [];
-            var change = function(data){
-                changes.forEach(function(fn){
+            var change = function(data) {
+                changes.forEach(function(fn) {
                     fn(data);
                 });
                 loginInfo.info = data;
                 return loginInfo;
             };
             return {
-                login: function(username, password) {
-                    return $http.post('/api/login', {
-                        username: username,
-                        password: password
-                    }).then(function(data) {
-                        change(data);
-                        loginInfo.username = data.data.username;
-                    })
+                login: function(user) {
+                    return $http.post('/api/login', user).then(change);
                 },
                 logout: function() {
-                    return $http.delete('/api/login').then(function() {
-                        change();
-                        loginInfo.username = undefined;
-                        return loginInfo;
-                    })
+                    return $http.delete('/api/login').then(change);
                 },
                 isLogin: function() {
-                    return $http.get('/api/login').then(function(data) {
-                        change();
-                        loginInfo.username = data.data.username;
-                        return loginInfo;
-                    });
+                    return $http.get('/api/login').then(change);
                 },
-                loginInfo: loginInfo
-                onchange: function(fn){
-                   
-                    }
+                loginInfo: loginInfo,
+                onchange: function(fn) {
+                    changes.push(fn);
+                }
 
-            }
+            };
 
         })
         .controller('MainCtrl', function($scope, login) {
+            login.isLogin();
             $scope.logout = function() {
                 login.logout();
             };
-            $scope.$watch(function() {
-                    return login.loginInfo.username;
-                },
-                function(n, o) {
-                    if (!!n) $scope.user = {
-                        username: n
-                    };
-                    else $scope.user = undefined;
-                });
+            login.onchange(function(data) {
+                $scope.loginInfo = data.data;
+            });
         })
         .controller('LoginCtrl', ['login', '$scope',
             function(login, $scope) {
                 var self = this;
-                login.isLogin();
+                //self.login = login.login.bind(login);
                 self.login = function(user) {
-                    login.login(user.username, user.password);
+                    login.login(user);
                 }
-                $scope.$watch(function() {
-                        return login.loginInfo.username;
-                    },
-                    function(n, o) {
-                        if (!!n) self.user = {
-                            username: n
-                        };
-                        else self.user = undefined;
-                    });
+                login.onchange(function(data) {
+                    self.loginInfo = data.data;
+                });
 
             }
         ]);

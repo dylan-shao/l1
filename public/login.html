@@ -1,10 +1,12 @@
-    <form ng-show="!login.user" onsubmit="return false;">
+    <form ng-show="!loginCtrl.loginInfo.username" onsubmit="return false;">
         <label>UserName:</label>
         <input ng-model="nu.username">
         <label>Password:</label>
         <input ng-model="nu.password">
-        <button ng-click="login.login(nu)">Login</button>
-        <div class="errmsg" ng-hide="!login.msg">{{login.msg}}</div>
+        <button ng-click="loginCtrl.login(nu)">Login</button>
+        <div class="errmsg" ng-hide="!loginCtrl.loginInfo.msg">
+            {{loginCtrl.loginInfo.msg}}
+        </div>
     </form>
 
 

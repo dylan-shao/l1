@@ -7,7 +7,7 @@
             scope: {
                 user : '='
             },
-            controller: 'LoginCtrl as login'
+            controller: 'LoginCtrl as loginCtrl'
 
         }
     });

@@ -9,20 +9,13 @@
 </head>
 
 <body ng-app="app" ng-controller="LoginCtrl as login">
-    <form ng-show="!login.user" onsubmit="return false;">
-        <label>UserName:</label>
-        <input ng-model="nu.username">
-        <label>Password:</label>
-        <input ng-model="nu.password">
-        <button ng-click="login.login(nu)">Login</button>
-        <div class="errmsg" ng-hide="!login.msg">{{login.msg}}</div>
-    </form>
-
+    <my-login user="login.user"></my-login>
+    <!--<div my-login></div>-->
     <div ng-show="!!login.user">Welcome, {{login.user.username}},
-
         <a class="btn btn-danger" ng-click="login.logout()">Logout</a>
     </div>
     <script src="app.js"></script>
+    <script src="login.js"></script>
 </body>
 
 </html>

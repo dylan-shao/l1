@@ -32,7 +32,9 @@
                             self.user = {username: data.data.username};
                             $rootScope.$broadcast('login success', self.user);
                     } 
-                    else self.msg = data.data.msg;
+                    else{ self.msg = data.data.msg;
+                    }
+                    $scope.nu = undefined;
                     });
                 }
 

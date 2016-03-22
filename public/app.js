@@ -2,41 +2,78 @@
     'use strict';
 
     angular.module('app', [])
-        .controller('MainCtrl', function($scope, $http, $rootScope) {
-            $scope.logout = function() {
-                $http.delete('/api/login').success(function() {
-                    $scope.user = undefined
-                    $rootScope.$broadcast('logout');
-                })
+        .factory('login', function($http) {
+            var loginInfo = {};
+            var changes = [];
+            var change = function(data){
+                changes.forEach(function(fn){
+                    fn(data);
+                });
+                loginInfo.info = data;
+                return loginInfo;
             };
-            $scope.$on('login success', function(e, user){
-                $scope.user = user;
-            });
-        })
-        .controller('LoginCtrl', ['$scope', '$http', '$rootScope',
-            function($scope, $http, $rootScope) {
-                var self = this;
-                $scope.$on('logout',function(){
-                    self.user = undefined;
-                });
-                $http.get('/api/login').success(function(resp) {
-                    if (resp.username) {
-                        self.user = resp;
-                        $rootScope.$broadcast('login success', self.user);
-
-                    }
-                });
-                self.login = function(user) {
-                    $http.post('/api/login', user).then(function(data) {
-                        if (data.data.username) {
-                            self.user = {username: data.data.username};
-                            $rootScope.$broadcast('login success', self.user);
-                    } 
-                    else{ self.msg = data.data.msg;
-                    }
-                    $scope.nu = undefined;
+            return {
+                login: function(username, password) {
+                    return $http.post('/api/login', {
+                        username: username,
+                        password: password
+                    }).then(function(data) {
+                        change(data);
+                        loginInfo.username = data.data.username;
+                    })
+                },
+                logout: function() {
+                    return $http.delete('/api/login').then(function() {
+                        change();
+                        loginInfo.username = undefined;
+                        return loginInfo;
+                    })
+                },
+                isLogin: function() {
+                    return $http.get('/api/login').then(function(data) {
+                        change();
+                        loginInfo.username = data.data.username;
+                        return loginInfo;
                     });
+                },
+                loginInfo: loginInfo
+                onchange: function(fn){
+                   
+                    }
+
+            }
+
+        })
+        .controller('MainCtrl', function($scope, login) {
+            $scope.logout = function() {
+                login.logout();
+            };
+            $scope.$watch(function() {
+                    return login.loginInfo.username;
+                },
+                function(n, o) {
+                    if (!!n) $scope.user = {
+                        username: n
+                    };
+                    else $scope.user = undefined;
+                });
+        })
+        .controller('LoginCtrl', ['login', '$scope',
+            function(login, $scope) {
+                var self = this;
+                login.isLogin();
+                self.login = function(user) {
+                    login.login(user.username, user.password);
                 }
+                $scope.$watch(function() {
+                        return login.loginInfo.username;
+                    },
+                    function(n, o) {
+                        if (!!n) self.user = {
+                            username: n
+                        };
+                        else self.user = undefined;
+                    });
 
             }
         ]);

@@ -2,7 +2,7 @@
     'use strict';
     angular.module('app').directive('myLogin', function() {
         return {
-            restrict: 'E',
+            //restrict: 'E',
             templateUrl: 'login.html',
             scope: {
                 user : '='

@@ -8,11 +8,13 @@
     <script src="libs/angular/angular.js"></script>
 </head>
 
-<body ng-app="app" ng-controller="LoginCtrl as login">
-    <my-login user="login.user"></my-login>
+<body ng-app="app">
+    <my-login></my-login>
     <!--<div my-login></div>-->
-    <div ng-show="!!login.user">Welcome, {{login.user.username}},
-        <a class="btn btn-danger" ng-click="login.logout()">Logout</a>
+    <div ng-controller="MainCtrl">
+        <div ng-show="!!user">Welcome, {{user.username}},
+            <a class="btn btn-danger" ng-click="logout()">Logout</a>
+        </div>
     </div>
     <script src="app.js"></script>
     <script src="login.js"></script>
